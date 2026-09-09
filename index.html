@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ff6aa2">
+  <title>Ситком-викторина · Девичник Ани</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+
+    <section id="screen-start" class="screen active">
+      <p class="eyebrow">Девичник Ани 💍</p>
+      <h1>Ситком-<br>викторина</h1>
+      <p class="lead">Картинка, мем или звук — что за сериал? Потом открывай ответ, доп-вопросы и факт.</p>
+
+      <div class="legend" aria-hidden="true">
+        <span class="chip chip-himym">☂️ Как я встретил вашу маму</span>
+        <span class="chip chip-tbbt">⚛️ Теория большого взрыва</span>
+        <span class="chip chip-friends">☕ Друзья</span>
+        <span class="chip chip-twilight">🧛 Сумерки</span>
+        <span class="chip chip-office">📎 Офис</span>
+      </div>
+
+      <div class="label">Сколько вопросов?</div>
+      <div id="count-picker" class="segmented" role="radiogroup" aria-label="Сколько вопросов">
+        <button type="button" data-count="20" role="radio" aria-checked="false">20</button>
+        <button type="button" data-count="30" role="radio" aria-checked="true" class="on">30</button>
+        <button type="button" data-count="40" role="radio" aria-checked="false">40</button>
+        <button type="button" data-count="all" role="radio" aria-checked="false">Все</button>
+      </div>
+
+      <button id="btn-start" class="btn btn-primary btn-big">Начать 🎬</button>
+    </section>
+
+    <section id="screen-game" class="screen">
+      <header class="topbar">
+        <span id="progress-text" class="progress-text">1 / 30</span>
+      </header>
+      <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+
+      <article class="card media-card" id="card">
+        <p class="card-label" id="card-label">Что за сериал?</p>
+        <div id="media" class="media"></div>
+      </article>
+
+      <button id="btn-reveal" class="btn btn-primary btn-big">Показать ответ 👀</button>
+
+      <div id="reveal" class="reveal hidden" aria-live="polite">
+        <div id="show-badge" class="show-badge"></div>
+        <h2 id="answer-title" class="answer-title"></h2>
+
+        <p class="bonus-hint" id="bonus-hint">Доп-вопросы — тапни, чтобы открыть ответ.</p>
+        <div id="bonus" class="bonus"></div>
+
+        <p id="fact" class="fact"></p>
+        <button id="btn-next" class="btn btn-primary btn-big">Дальше →</button>
+      </div>
+    </section>
+
+    <section id="screen-end" class="screen">
+      <p class="eyebrow">Финал 🎉</p>
+      <h2>Это было леген… подожди-подожди… дарно! 🏆</h2>
+      <p id="end-sub" class="lead"></p>
+      <button id="btn-restart" class="btn btn-primary btn-big">Ещё раунд 🔁</button>
+    </section>
+
+  </main>
+
+  <audio id="audio-el" preload="auto"></audio>
+  <div id="confetti" aria-hidden="true"></div>
+
+  <script src="questions.js"></script>
+  <script src="logic.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
