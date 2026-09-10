@@ -4,7 +4,6 @@
 
   const el = {
     screens: { start: $('screen-start'), game: $('screen-game'), end: $('screen-end') },
-    countPicker: $('count-picker'),
     btnStart: $('btn-start'),
     progressText: $('progress-text'),
     progressBar: $('progress-bar'),
@@ -25,7 +24,7 @@
     confetti: $('confetti'),
   };
 
-  const state = { questions: [], index: 0, count: 30, revealed: false };
+  const state = { questions: [], index: 0, revealed: false };
 
   // ---------- tiny synth for UI feedback (no files needed) ----------
   const Sfx = (() => {
@@ -83,19 +82,9 @@
     el.audio.load();
   };
 
-  // ---------- start screen ----------
-  el.countPicker.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-count]');
-    if (!btn) return;
-    el.countPicker.querySelectorAll('button').forEach((b) => { b.classList.remove('on'); b.setAttribute('aria-checked', 'false'); });
-    btn.classList.add('on');
-    btn.setAttribute('aria-checked', 'true');
-    state.count = btn.dataset.count === 'all' ? Infinity : Number(btn.dataset.count);
-  });
-
   // ---------- game ----------
   const startGame = () => {
-    state.questions = Logic.pickQuestions(QUESTIONS, state.count);
+    state.questions = QUESTIONS; // порядок задан в questions.js
     state.index = 0;
     show('game');
     renderQuestion();
@@ -104,13 +93,13 @@
   const renderMedia = (q) => {
     el.media.innerHTML = '';
     stopAudio();
+    el.cardLabel.textContent = q.question;
     switch (q.media.type) {
       case 'image': {
         const img = document.createElement('img');
         img.src = q.media.src;
-        img.alt = 'Кадр из сериала — угадай какого';
+        img.alt = 'Кадр из сериала';
         el.media.appendChild(img);
-        el.cardLabel.textContent = 'Что за сериал?';
         break;
       }
       case 'audio': {
@@ -121,18 +110,19 @@
           <button type="button" class="play" aria-label="Слушать">▶</button>
           <p class="audio-hint">Тапни, чтобы послушать ещё раз</p>`;
         const play = wrap.querySelector('.play');
+        const hint = wrap.querySelector('.audio-hint');
         el.audio.src = q.media.src;
         const sync = () => {
           wrap.classList.toggle('playing', !el.audio.paused && !el.audio.ended);
           play.textContent = !el.audio.paused && !el.audio.ended ? '❚❚' : '▶';
         };
         el.audio.onplay = el.audio.onpause = el.audio.onended = sync; // assign, not addEventListener: one live listener set per question
+        el.audio.onerror = () => { hint.textContent = 'Звук не загрузился — проверь, что сайт открыт с сервера'; };
         play.addEventListener('click', () => {
           if (el.audio.paused || el.audio.ended) { el.audio.currentTime = 0; el.audio.play().catch(() => {}); }
           else el.audio.pause();
         });
         el.media.appendChild(wrap);
-        el.cardLabel.textContent = 'Откуда этот звук?';
         el.audio.play().catch(() => {}); // autoplay may be blocked before the first tap — then the big ▶ works
         break;
       }
@@ -141,7 +131,6 @@
         p.className = 'quote';
         p.textContent = q.media.text;
         el.media.appendChild(p);
-        el.cardLabel.textContent = 'Откуда цитата?';
         break;
       }
       default: {
@@ -198,9 +187,10 @@
     burstConfetti();
     el.showBadge.textContent = `${Logic.SHOWS[q.show].emoji} ${Logic.SHOWS[q.show].label}`;
     el.showBadge.className = `show-badge show-${q.show}`;
-    el.answerTitle.textContent = q.title;
+    el.answerTitle.textContent = q.answer;
     el.fact.textContent = q.fact;
     el.fact.classList.toggle('hidden', !q.fact);
+    el.fact.classList.toggle('loud', Boolean(q.loud));
     renderBonus(q);
     el.btnReveal.classList.add('hidden');
     el.reveal.classList.remove('hidden');

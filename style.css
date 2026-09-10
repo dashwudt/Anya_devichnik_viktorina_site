@@ -45,9 +45,6 @@ body {
 h1 { margin: 0; color: #fff; font-size: clamp(40px, 12vw, 64px); line-height: .95; letter-spacing: -.02em; }
 h2 { margin: 0; color: #fff; font-size: clamp(26px, 7vw, 36px); line-height: 1.1; }
 .lead { margin: 0; color: #fff; opacity: .92; font-size: 17px; line-height: 1.4; }
-.label { color: #fff; font-weight: 600; display: block; margin-bottom: 8px; }
-.muted { opacity: .75; font-weight: 400; font-size: 14px; }
-
 .legend { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,.18); color: #fff; }
 .chip-himym { background: var(--himym); color: var(--ink); }
@@ -55,13 +52,6 @@ h2 { margin: 0; color: #fff; font-size: clamp(26px, 7vw, 36px); line-height: 1.1
 .chip-friends { background: var(--friends); color: #fff; }
 .chip-twilight { background: var(--twilight); color: #fff; }
 .chip-office { background: var(--office); color: #fff; }
-
-.segmented { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: rgba(255,255,255,.2); padding: 6px; border-radius: 16px; }
-.segmented button {
-  font: inherit; font-weight: 700; font-size: 16px; padding: 12px 0; border: 0; border-radius: 11px; cursor: pointer;
-  background: transparent; color: #fff;
-}
-.segmented button.on { background: #fff; color: var(--ink); }
 
 .btn {
   font: inherit; font-weight: 700; border: 0; border-radius: 16px; cursor: pointer;
@@ -85,7 +75,7 @@ h2 { margin: 0; color: #fff; font-size: clamp(26px, 7vw, 36px); line-height: 1.1
 }
 .media-card { animation: deal .35s cubic-bezier(.2,.8,.2,1); }
 @keyframes deal { from { opacity: 0; transform: translateY(20px) rotate(-1.5deg); } to { opacity: 1; transform: none; } }
-.card-label { margin: 0; color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.card-label { margin: 0; color: var(--ink); font-size: clamp(18px, 5vw, 22px); font-weight: 800; line-height: 1.25; }
 
 .media { display: grid; place-items: center; min-height: 200px; }
 .media img { width: 100%; max-height: 56vh; object-fit: contain; border-radius: 14px; background: #f3eefb; }
@@ -136,6 +126,7 @@ h2 { margin: 0; color: #fff; font-size: clamp(26px, 7vw, 36px); line-height: 1.1
 .bonus-item.open .a { display: block; color: rgba(255,255,255,.9); }
 
 .fact { margin: 0; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.18); color: #fff; line-height: 1.4; font-size: 15px; }
+.fact.loud { text-transform: uppercase; font-weight: 800; font-size: clamp(20px, 5.5vw, 26px); line-height: 1.25; }
 
 #confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 9; }
 #confetti i { position: absolute; top: -12px; width: 10px; height: 14px; border-radius: 2px; animation: fall linear forwards; }

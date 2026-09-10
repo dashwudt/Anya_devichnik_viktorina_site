@@ -13,7 +13,7 @@
     <section id="screen-start" class="screen active">
       <p class="eyebrow">Девичник Ани 💍</p>
       <h1>Ситком-<br>викторина</h1>
-      <p class="lead">Картинка, мем или звук — что за сериал? Потом открывай ответ, доп-вопросы и факт.</p>
+      <p class="lead">Картинка, мем или звук — и вопрос к нему. Потом открывай ответ, доп-вопросы и факт.</p>
 
       <div class="legend" aria-hidden="true">
         <span class="chip chip-himym">☂️ Как я встретил вашу маму</span>
@@ -21,14 +21,6 @@
         <span class="chip chip-friends">☕ Друзья</span>
         <span class="chip chip-twilight">🧛 Сумерки</span>
         <span class="chip chip-office">📎 Офис</span>
-      </div>
-
-      <div class="label">Сколько вопросов?</div>
-      <div id="count-picker" class="segmented" role="radiogroup" aria-label="Сколько вопросов">
-        <button type="button" data-count="20" role="radio" aria-checked="false">20</button>
-        <button type="button" data-count="30" role="radio" aria-checked="true" class="on">30</button>
-        <button type="button" data-count="40" role="radio" aria-checked="false">40</button>
-        <button type="button" data-count="all" role="radio" aria-checked="false">Все</button>
       </div>
 
       <button id="btn-start" class="btn btn-primary btn-big">Начать 🎬</button>
@@ -41,7 +33,7 @@
       <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
 
       <article class="card media-card" id="card">
-        <p class="card-label" id="card-label">Что за сериал?</p>
+        <p class="card-label" id="card-label"></p>
         <div id="media" class="media"></div>
       </article>
 

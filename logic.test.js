@@ -5,28 +5,8 @@ const path = require('node:path');
 const Logic = require('./logic.js');
 const QUESTIONS = require('./questions.js');
 
-const seq = (vals) => { let i = 0; return () => vals[i++ % vals.length]; };
-
-test('pickQuestions: respects count and balances shows round-robin', () => {
-  const all = [];
-  for (const show of ['a', 'b', 'c', 'd']) for (let i = 0; i < 5; i++) all.push({ show, i });
-  const picked = Logic.pickQuestions(all, 8, seq([0.1]));
-  assert.equal(picked.length, 8);
-  const byShow = picked.reduce((m, q) => ((m[q.show] = (m[q.show] || 0) + 1), m), {});
-  assert.deepEqual(byShow, { a: 2, b: 2, c: 2, d: 2 });
-});
-
-test('pickQuestions: count >= total returns everything, no duplicates', () => {
-  const all = [{ show: 'a' }, { show: 'a' }, { show: 'b' }];
-  const picked = Logic.pickQuestions(all, 99, Math.random);
-  assert.equal(picked.length, 3);
-  assert.equal(new Set(picked).size, 3);
-});
-
-test('no scoring left in Logic', () => {
-  assert.equal(Logic.toggleAward, undefined);
-  assert.equal(Logic.tally, undefined);
-  assert.equal(Logic.SHOW_POINTS, undefined);
+test('no scoring, count picking or shuffling left in Logic', () => {
+  assert.deepEqual(Object.keys(Logic), ['SHOWS']);
 });
 
 test('shows: five shows incl. Office, all labels in Russian', () => {
@@ -34,19 +14,20 @@ test('shows: five shows incl. Office, all labels in Russian', () => {
   for (const s of Object.values(Logic.SHOWS)) assert.doesNotMatch(s.label, /[A-Za-z]/);
 });
 
-test('questions: valid shows, unique ids, media files exist, text is rare, no points', () => {
+test('questions: each has a real question + answer, media files exist, text is rare', () => {
+  assert.equal(QUESTIONS.length, 27);
   const ids = new Set();
   let text = 0;
   for (const q of QUESTIONS) {
     assert.ok(Logic.SHOWS[q.show], `unknown show ${q.show} in ${q.id}`);
     assert.ok(!ids.has(q.id), `duplicate id ${q.id}`);
     ids.add(q.id);
-    assert.ok(q.title.trim().length > 0, `empty title ${q.id}`);
+    assert.equal(q.title, undefined, `legacy title in ${q.id}`);
+    assert.ok(q.question.trim().length > 0, `empty question in ${q.id}`);
+    assert.doesNotMatch(q.question, /что за сериал|откуда/i, `"what show" question in ${q.id}`);
+    assert.ok(q.answer.trim().length > 0, `empty answer ${q.id}`);
     assert.ok(Array.isArray(q.bonus), `bonus missing ${q.id}`);
-    for (const b of q.bonus) {
-      assert.ok(b.q && b.a, `bad bonus in ${q.id}`);
-      assert.equal(b.pts, undefined, `points left in ${q.id}`);
-    }
+    for (const b of q.bonus) assert.ok(b.q && b.a, `bad bonus in ${q.id}`);
     switch (q.media.type) {
       case 'image':
       case 'audio':
@@ -60,16 +41,33 @@ test('questions: valid shows, unique ids, media files exist, text is rare, no po
         assert.fail(`unknown media type ${q.media.type} in ${q.id}`);
     }
   }
-  assert.ok(QUESTIONS.length >= 60);
   assert.ok(text / QUESTIONS.length < 0.15, 'too many text-only questions');
   for (const show of Object.keys(Logic.SHOWS)) {
-    assert.ok(QUESTIONS.filter((q) => q.show === show).length >= 10, `too few questions for ${show}`);
+    assert.ok(QUESTIONS.some((q) => q.show === show), `no questions for ${show}`);
   }
 });
 
+test('questions: curated order — хао-хао stays, no two neighbours from the same show, ends on «леген…дарно»', () => {
+  assert.ok(QUESTIONS.some((q) => q.id === 'twilight-eyesonfire'), 'хао-хао must stay');
+  for (let i = 1; i < QUESTIONS.length; i++) {
+    assert.notEqual(QUESTIONS[i].show, QUESTIONS[i - 1].show, `same show twice in a row at #${i + 1}: ${QUESTIONS[i].id}`);
+  }
+  assert.equal(QUESTIONS.at(-1).id, 'himym-legendary');
+  for (const id of ['himym-metted', 'himym-mall', 'himym-suitup']) {
+    assert.ok(!QUESTIONS.some((q) => q.id === id), `${id} should be removed`);
+  }
+});
+
+test('questions: quote-style answers exist and are in «»; loud fact only on spider monkey', () => {
+  const quoted = QUESTIONS.filter((q) => /^«.+»$/.test(q.answer));
+  assert.ok(quoted.length >= 8, `only ${quoted.length} quote answers`);
+  assert.deepEqual(QUESTIONS.filter((q) => q.loud).map((q) => q.id), ['twilight-spidermonkey']);
+  assert.equal(QUESTIONS.find((q) => q.id === 'tbbt-gravity').media.type, 'audio');
+});
+
 test('questions: user-facing text is Russian (Latin only in known proper nouns)', () => {
-  const allowed = /The Solids|Barenaked Ladies|The Rembrandts|Blue Foundation|Muse|Paramore|Iron & Wine|Кураж-Бамбей/g;
-  const textOf = (q) => [q.title, q.fact || '', q.media.text || '', ...q.bonus.flatMap((b) => [b.q, b.a])].join(' ');
+  const allowed = /Blue Foundation|Eyes on Fire|Muse|Paramore|Iron & Wine|Кураж-Бамбей/g;
+  const textOf = (q) => [q.question, q.answer, q.fact || '', q.media.text || '', ...q.bonus.flatMap((b) => [b.q, b.a])].join(' ');
   for (const q of QUESTIONS) {
     const rest = textOf(q).replace(allowed, '');
     assert.doesNotMatch(rest, /[A-Za-z]/, `English left in ${q.id}: ${rest.match(/[A-Za-z][^\s,.!?»)]*/g)}`);
